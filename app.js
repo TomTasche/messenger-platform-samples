@@ -331,6 +331,8 @@ function waitForPromiseSuccess(promise) {
 }
 
 function findAnswer(senderID, messageText) {
+    sendTypingOn(senderID);
+
     var mapsPromise = queryMaps(messageText);
 
     var address;
