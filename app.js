@@ -245,11 +245,13 @@ function receivedMessage(event) {
             messageId, appId, metadata);
         return;
     } else if (quickReply) {
-        var quickReplyPayload = quickReply.payload;
-        console.log("Quick reply for message %s with payload %s",
-            messageId, quickReplyPayload);
+        var payload = JSON.parse(quickReply.payload);
+        if (payload.type === "maps") {
+            sendMapsAnswer(senderID, payload.address);
+        } else if (payload.type === "weather") {
+            sendWeatherAnswer(senderID, payload.address);
+        }
 
-        sendTextMessage(senderID, "Quick reply tapped");
         return;
     }
 
@@ -292,7 +294,7 @@ function receivedMessage(event) {
                 break;
 
             case 'quick reply':
-                sendQuickReply(senderID);
+                //sendQuickReply(senderID);
                 break;
 
             case 'read receipt':
@@ -376,9 +378,21 @@ function findAnswer(senderID, messageText) {
         } else if (address) {
             // maps or weather
 
-            sendMapsAnswer(senderID, address);
+            var options = [{
+                title: "weather",
+                payload: {
+                    type: "weather",
+                    address: address
+                }
+            }, {
+                title: "maps",
+                payload: {
+                    type: "maps",
+                    address: address
+                }
+            }];
 
-            sendWeatherAnswer(senderID, address);
+            sendQuickReply(senderID, "address recognized. what do you want me to do with it?", options);
         } else {
             // google
 
@@ -860,27 +874,26 @@ function sendReceiptMessage(recipientId) {
  * Send a message with Quick Reply buttons.
  *
  */
-function sendQuickReply(recipientId) {
+function sendQuickReply(recipientId, question, options) {
+    var quickReplies = [];
+    for (var i = 0; i < options.length; i++) {
+        var option = options[i];
+
+        var quickReply = {};
+        quickReply.content_type = "text";
+        quickReply.title = option.title;
+        quickReply.payload = JSON.stringify(option.payload);
+
+        quickReplies.push(quickReply);
+    }
+
     var messageData = {
         recipient: {
             id: recipientId
         },
         message: {
-            text: "What's your favorite movie genre?",
-            metadata: "DEVELOPER_DEFINED_METADATA",
-            quick_replies: [{
-                "content_type": "text",
-                "title": "Action",
-                "payload": "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_ACTION"
-            }, {
-                "content_type": "text",
-                "title": "Comedy",
-                "payload": "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_COMEDY"
-            }, {
-                "content_type": "text",
-                "title": "Drama",
-                "payload": "DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_DRAMA"
-            }]
+            text: question,
+            quick_replies: quickReplies
         }
     };
 
