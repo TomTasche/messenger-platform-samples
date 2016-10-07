@@ -480,12 +480,12 @@ function queryPlaces(input) {
             result = result.result;
 
             var address = {};
-            address.formattedAddress = bestResult.formatted_address;
+            address.formattedAddress = result.formatted_address;
 
             var locality;
             var sublocality;
 
-            var components = bestResult.address_components;
+            var components = result.address_components;
             for (var i = 0; i < components.length; i++) {
                 var component = components[i];
 
@@ -506,8 +506,8 @@ function queryPlaces(input) {
 
             var place = {};
             place.address = address;
-            place.telephoneNumber = bestResult.international_phone_number;
-            place.website = bestResult.website;
+            place.telephoneNumber = result.international_phone_number;
+            place.website = result.website;
 
             future.resolve(address);
         }).catch(function(error) {
