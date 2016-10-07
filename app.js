@@ -425,11 +425,11 @@ function findAnswer(senderID, messageText) {
                 title: "website",
                 payload: {
                     type: "website",
-                    url: place.website
+                    website: place.website
                 }
             }];
 
-            sendQuickReply(senderID, "address recognized. what do you want me to do with it?", options);
+            sendQuickReply(senderID, "place recognized. what do you want me to do with it?", options);
         } else {
             // google
 
@@ -509,7 +509,7 @@ function queryPlaces(input) {
             place.telephoneNumber = result.international_phone_number;
             place.website = result.website;
 
-            future.resolve(address);
+            future.resolve(place);
         }).catch(function(error) {
             console.error("places", error);
 
