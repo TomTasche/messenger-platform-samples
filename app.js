@@ -419,7 +419,7 @@ function queryMaps(input) {
         var locality;
         var sublocality;
 
-        var components = address.address_components;
+        var components = bestResult.address_components;
         for (var i = 0; i < components.length; i++) {
             var component = components[i];
 
