@@ -250,6 +250,10 @@ function receivedMessage(event) {
             sendMapsAnswer(senderID, payload.address);
         } else if (payload.type === "weather") {
             sendWeatherAnswer(senderID, payload.address);
+        } else if (payload.type === "call") {
+            sendTextMessage(senderID, "click here: " + payload.number);
+        } else if (payload.type === "website") {
+            sendTextMessage(senderID, "click here: " + payload.website);
         }
 
         return;
@@ -367,6 +371,13 @@ function findAnswer(senderID, messageText) {
         knowledge = knowledgeResult;
     });
 
+    var placePromise = queryPlaces(messageText);
+
+    var place;
+    placePromise.then(function(placeResult) {
+        place = placeResult;
+    });
+
     var waitingPromises = [mapsPromise, knowledgePromise].map(waitForPromiseSuccess);
     Promise.all(waitingPromises).then(function() {
         sendTypingOff(senderID);
@@ -376,8 +387,6 @@ function findAnswer(senderID, messageText) {
 
             sendTextMessage(senderID, knowledge);
         } else if (address) {
-            // maps or weather
-
             var options = [{
                 title: "weather",
                 payload: {
@@ -393,12 +402,126 @@ function findAnswer(senderID, messageText) {
             }];
 
             sendQuickReply(senderID, "address recognized. what do you want me to do with it?", options);
+        } else if (place) {
+            var options = [{
+                title: "weather",
+                payload: {
+                    type: "weather",
+                    address: place.address
+                }
+            }, {
+                title: "maps",
+                payload: {
+                    type: "maps",
+                    address: place.address
+                }
+            }, {
+                title: "call",
+                payload: {
+                    type: "call",
+                    number: place.telephoneNumber
+                }
+            }, {
+                title: "website",
+                payload: {
+                    type: "website",
+                    url: place.website
+                }
+            }];
+
+            sendQuickReply(senderID, "address recognized. what do you want me to do with it?", options);
         } else {
             // google
 
             sendTextMessage(senderID, "huh?");
         }
     });
+}
+
+function queryPlaces(input) {
+    var future = deferred();
+
+    let requestOptions = {
+        method: "GET",
+        uri: "https://maps.googleapis.com/maps/api/place/autocomplete/json",
+        json: true,
+        qs: {
+            input: input,
+            key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw"
+        }
+    };
+
+    var promise = requestPromise(requestOptions);
+    promise.then(function(result) {
+        console.log("places", result);
+
+        var success = result.predictions.length > 0;
+        if (!success) {
+            future.reject();
+
+            return;
+        }
+
+        var bestResult = result.predictions[0];
+        var placeId = bestResult.place_id;
+
+        let requestOptions = {
+            method: "GET",
+            uri: "https://maps.googleapis.com/maps/api/place/details/json",
+            json: true,
+            qs: {
+                placeid: placeId,
+                key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw"
+            }
+        };
+
+        var promise = requestPromise(requestOptions);
+        promise.then(function(result) {
+            result = result.result;
+
+            var address = {};
+            address.formattedAddress = bestResult.formatted_address;
+
+            var locality;
+            var sublocality;
+
+            var components = bestResult.address_components;
+            for (var i = 0; i < components.length; i++) {
+                var component = components[i];
+
+                for (var j = 0; j < component.types.length; j++) {
+                    var type = component.types[j];
+                    if (type === "sublocality") {
+                        sublocality = component.long_name;
+                    } else if (type === "locality") {
+                        locality = component.long_name;
+                    }
+                }
+
+                if (locality && sublocality) {
+                    break;
+                }
+            }
+            address.sublocality = sublocality || locality;
+
+            var place = {};
+            place.address = address;
+            place.telephoneNumber = bestResult.international_phone_number;
+            place.website = bestResult.website;
+
+            future.resolve(address);
+        }).catch(function(error) {
+            console.error("places", error);
+
+            future.reject(error);
+        });
+    }).catch(function(error) {
+        console.error("places", error);
+
+        future.reject(error);
+    });
+
+    return future.promise;
 }
 
 function queryMaps(input) {
