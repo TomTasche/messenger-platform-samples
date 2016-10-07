@@ -416,7 +416,7 @@ function queryKnowledgeGraph(input) {
     promise.then(function(result) {
         console.log("knowledge graph", result);
 
-        var success = result.itemListElement.length;
+        var success = result.itemListElement.length > 0;
         if (!success) {
             future.reject();
         }
