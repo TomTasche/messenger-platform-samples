@@ -334,11 +334,9 @@ function sendMapsAnswer(senderID, address) {
     var encodedAddress = encodeURIComponent(address);
 
     var imageUrl = "https://maps.googleapis.com/maps/api/staticmap?size=640x400&markers=size:big%7Ccolor:red%7C" + encodedAddress;
-    console.log(imageUrl);
-    imageUrl = "https://i.ytimg.com/vi/m5d1FlSeF-M/maxresdefault.jpg";
     sendImageMessage(senderID, imageUrl);
 
-    var mapsUrl = "http://maps.google.com/?q=" + encodedAddress;
+    var mapsUrl = "https://maps.google.com/?q=" + encodedAddress;
     sendTextMessage(senderID, mapsUrl);
 }
 
