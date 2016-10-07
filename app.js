@@ -323,7 +323,7 @@ function queryKnowledgeGraph(senderID, messageText) {
         uri: "https://kgsearch.googleapis.com/v1/entities:search",
         json: true,
         qs: {
-            query: "taylor swift",
+            query: messageText,
             key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw",
             limit: 1,
             indent: "True"
