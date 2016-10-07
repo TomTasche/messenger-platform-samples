@@ -247,6 +247,8 @@ function receivedMessage(event) {
     } else if (quickReply) {
         var payload = JSON.parse(quickReply.payload);
         if (payload.type === "maps") {
+          if (true) return;
+
             // workaround for old bug
             if (!payload.address) {
                 return;
