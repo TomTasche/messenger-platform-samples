@@ -347,16 +347,16 @@ function findAnswer(senderID, messageText) {
 
     var waitingPromises = [mapsPromise, knowledgePromise].map(waitForPromiseSuccess);
     Promise.all(waitingPromises).then(function() {
-        if (address) {
+        if (knowledge) {
+            // music -> spotify or youtube
+
+            sendTextMessage(senderID, knowledge);
+        } else if (address) {
             // maps or weather
 
             var mapsUrl = "http://maps.google.com/?q=" + encodeURIComponent(address);
 
             sendTextMessage(senderID, mapsUrl);
-        } else if (knowledge) {
-            // music -> spotify or youtube
-
-            sendTextMessage(senderID, knowledge);
         } else {
             // google
 
