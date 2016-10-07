@@ -17,7 +17,8 @@ const
     express = require('express'),
     https = require('https'),
     request = require('request'),
-    requestPromise = require('request-promise');
+    requestPromise = require('request-promise'),
+    deferred = require('deferred');
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
@@ -318,29 +319,117 @@ function receivedMessage(event) {
     }
 }
 
-function queryKnowledgeGraph(senderID, messageText) {
+function waitForPromiseSuccess(promise) {
+    var future = deferred();
+
+    promise.then(future.resolve);
+    promise.catch(function() {
+        future.resolve(null);
+    });
+
+    return future.promise;
+}
+
+function findAnswer(senderID, messageText) {
+    var mapsPromise = queryMaps(messageText);
+
+    var address;
+    mapsPromise.then(function(mapsResult) {
+      address = mapsResult;
+    });
+
+    var knowledgePromise = queryKnowledgeGraph(messageText);
+
+    var knowledge;
+    knowledgePromise.then(function(knowledgeResult) {
+      knowledge = knowledgeResult;
+    });
+
+    var waitingPromises = [mapsPromise, knowledgePromise].map(waitForPromiseSuccess);
+    Promise.all(waitingPromises).then(function() {
+      if (address) {
+        // maps or weather
+
+        var mapsUrl = "http://maps.google.com/?q=" + encodeURIComponent(address);
+
+        sendTextMessage(senderID, mapsUrl);
+      } else if (knowledge) {
+        // music -> spotify or youtube
+
+        sendTextMessage(senderID, knowledge);
+      } else {
+        // google
+
+        sendTextMessage(senderID, "huh?");
+      }
+    });
+}
+
+function queryMaps(input) {
+    var future = deferred();
+
     let requestOptions = {
         method: "GET",
-        uri: "https://kgsearch.googleapis.com/v1/entities:search",
+        uri: "https://maps.googleapis.com/maps/api/geocode/json",
         json: true,
         qs: {
-            query: messageText,
-            key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw",
-            limit: 1,
-            indent: "True"
+            address: input,
+            key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw"
         }
     };
 
     var promise = requestPromise(requestOptions);
     promise.then(function(result) {
-        var item = result.itemListElement[0];
-        var textMessage = item.result.description;
+        console.log("maps", result);
 
-        sendTextMessage(senderID, textMessage);
+        var success = result.status == "OK";
+        if (!success) {
+            future.reject();
+        }
+
+        var address = result.results[0].formatted_address;
+        future.resolve(address);
     }).catch(function(error) {
-        console.log(JSON.stringify(error));
-        throw new Error("yikes");
+        console.error("maps", error);
+
+        future.reject(error);
     });
+
+    return future.promise;
+}
+
+function queryKnowledgeGraph(input) {
+    var future = deferred();
+
+    let requestOptions = {
+        method: "GET",
+        uri: "https://kgsearch.googleapis.com/v1/entities:search",
+        json: true,
+        qs: {
+            query: input,
+            key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw",
+            limit: 1
+        }
+    };
+
+    var promise = requestPromise(requestOptions);
+    promise.then(function(result) {
+        console.log("knowledge graph", result);
+
+        var success = result.itemListElement.length;
+        if (!success) {
+            future.reject();
+        }
+
+        var description = result.itemListElement[0].result.description;
+        future.resolve(description);
+    }).catch(function(error) {
+        console.error("knowledge graph", error);
+
+        future.reject(error);
+    });
+
+    return future.promise;
 }
 
 
