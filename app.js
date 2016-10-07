@@ -331,13 +331,21 @@ function waitForPromiseSuccess(promise) {
 }
 
 function sendMapsAnswer(senderID, address) {
-    var encodedAddress = encodeURIComponent(address);
+    var formattedAddress = address.formattedAddress;
+    var encodedAddress = encodeURIComponent(formattedAddress);
 
     var imageUrl = "https://maps.googleapis.com/maps/api/staticmap?size=640x400&key=AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw&markers=size:big%7Ccolor:red%7C" + encodedAddress;
     sendImageMessage(senderID, imageUrl);
 
     var mapsUrl = "https://maps.google.com/?q=" + encodedAddress;
     sendTextMessage(senderID, mapsUrl);
+}
+
+function sendWeatherAnswer(senderID, address) {
+    var sublocality = address.sublocality;
+
+    var searchUrl = "https://www.google.com/search?q=" + encodeURIComponent("weather " + sublocality);
+    sendTextMessage(senderID, searchUrl);
 }
 
 function findAnswer(senderID, messageText) {
@@ -369,6 +377,8 @@ function findAnswer(senderID, messageText) {
             // maps or weather
 
             sendMapsAnswer(senderID, address);
+
+            sendWeatherAnswer(senderID, address);
         } else {
             // google
 
@@ -401,7 +411,33 @@ function queryMaps(input) {
             return;
         }
 
-        var address = result.results[0].formatted_address;
+        var bestResult = result.results[0];
+
+        var address = {};
+        address.formattedAddress = bestResult.formatted_address;
+
+        var locality;
+        var sublocality;
+
+        var components = address.address_components;
+        for (var i = 0; i < components.length; i++) {
+            var component = components[i];
+
+            for (var j = 0; j < component.types.length; j++) {
+                var type = component.types[j];
+                if (type === "sublocality") {
+                    sublocality = component.long_name;
+                } else if (type === "locality") {
+                    locality = component.long_name;
+                }
+            }
+
+            if (locality && sublocality) {
+                break;
+            }
+        }
+        address.sublocality = sublocality || locality;
+
         future.resolve(address);
     }).catch(function(error) {
         console.error("maps", error);
