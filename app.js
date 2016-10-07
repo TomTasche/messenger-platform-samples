@@ -333,7 +333,7 @@ function waitForPromiseSuccess(promise) {
 function sendMapsAnswer(senderID, address) {
     var encodedAddress = encodeURIComponent(address);
 
-    var imageUrl = "https://maps.googleapis.com/maps/api/staticmap?size=640x400&markers=size:big%7Ccolor:red%7C" + encodedAddress;
+    var imageUrl = "https://maps.googleapis.com/maps/api/staticmap?size=640x400&key=AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw&markers=size:big%7Ccolor:red%7C" + encodedAddress;
     sendImageMessage(senderID, imageUrl);
 
     var mapsUrl = "https://maps.google.com/?q=" + encodedAddress;
