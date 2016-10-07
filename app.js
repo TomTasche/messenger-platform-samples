@@ -549,6 +549,11 @@ function queryMaps(input) {
         }
 
         var bestResult = result.results[0];
+        if (bestResult.partial_match) {
+            future.reject();
+
+            return;
+        }
 
         var address = {};
         address.formattedAddress = bestResult.formatted_address;
