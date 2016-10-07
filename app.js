@@ -312,7 +312,7 @@ function receivedMessage(event) {
                 break;
 
             default:
-                queryKnowledgeGraph(senderID, messageText);
+                findAnswer(senderID, messageText);
         }
     } else if (messageAttachments) {
         sendTextMessage(senderID, "Message with attachment received");
@@ -382,7 +382,7 @@ function queryMaps(input) {
     promise.then(function(result) {
         console.log("maps", result);
 
-        var success = result.status == "OK";
+        var success = result.status === "OK";
         if (!success) {
             future.reject();
 
