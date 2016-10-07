@@ -330,6 +330,16 @@ function waitForPromiseSuccess(promise) {
     return future.promise;
 }
 
+function sendMapsAnswer(senderID, address) {
+    var encodedAddress = encodeURIComponent(address);
+
+    var imageUrl = "https://maps.googleapis.com/maps/api/staticmap?size=640x400&markers=size:big%7Ccolor:red%7C" + encodedAddress;
+    sendImageMessage(senderID, imageUrl);
+
+    var mapsUrl = "http://maps.google.com/?q=" + encodedAddress;
+    sendTextMessage(senderID, mapsUrl);
+}
+
 function findAnswer(senderID, messageText) {
     sendTypingOn(senderID);
 
@@ -356,9 +366,7 @@ function findAnswer(senderID, messageText) {
         } else if (address) {
             // maps or weather
 
-            var mapsUrl = "http://maps.google.com/?q=" + encodeURIComponent(address);
-
-            sendTextMessage(senderID, mapsUrl);
+            sendMapsAnswer(senderID, address);
         } else {
             // google
 
@@ -531,7 +539,9 @@ function receivedAccountLink(event) {
  * Send an image using the Send API.
  *
  */
-function sendImageMessage(recipientId) {
+function sendImageMessage(recipientId, imageUrl) {
+    imageUrl = imageUrl || SERVER_URL + "/assets/rift.png";
+
     var messageData = {
         recipient: {
             id: recipientId
@@ -540,7 +550,7 @@ function sendImageMessage(recipientId) {
             attachment: {
                 type: "image",
                 payload: {
-                    url: SERVER_URL + "/assets/rift.png"
+                    url: imageUrl
                 }
             }
         }
