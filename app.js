@@ -335,33 +335,33 @@ function findAnswer(senderID, messageText) {
 
     var address;
     mapsPromise.then(function(mapsResult) {
-      address = mapsResult;
+        address = mapsResult;
     });
 
     var knowledgePromise = queryKnowledgeGraph(messageText);
 
     var knowledge;
     knowledgePromise.then(function(knowledgeResult) {
-      knowledge = knowledgeResult;
+        knowledge = knowledgeResult;
     });
 
     var waitingPromises = [mapsPromise, knowledgePromise].map(waitForPromiseSuccess);
     Promise.all(waitingPromises).then(function() {
-      if (address) {
-        // maps or weather
+        if (address) {
+            // maps or weather
 
-        var mapsUrl = "http://maps.google.com/?q=" + encodeURIComponent(address);
+            var mapsUrl = "http://maps.google.com/?q=" + encodeURIComponent(address);
 
-        sendTextMessage(senderID, mapsUrl);
-      } else if (knowledge) {
-        // music -> spotify or youtube
+            sendTextMessage(senderID, mapsUrl);
+        } else if (knowledge) {
+            // music -> spotify or youtube
 
-        sendTextMessage(senderID, knowledge);
-      } else {
-        // google
+            sendTextMessage(senderID, knowledge);
+        } else {
+            // google
 
-        sendTextMessage(senderID, "huh?");
-      }
+            sendTextMessage(senderID, "huh?");
+        }
     });
 }
 
@@ -385,6 +385,8 @@ function queryMaps(input) {
         var success = result.status == "OK";
         if (!success) {
             future.reject();
+
+            return;
         }
 
         var address = result.results[0].formatted_address;
@@ -419,6 +421,8 @@ function queryKnowledgeGraph(input) {
         var success = result.itemListElement.length > 0;
         if (!success) {
             future.reject();
+
+            return;
         }
 
         var description = result.itemListElement[0].result.description;
