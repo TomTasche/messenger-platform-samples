@@ -247,6 +247,11 @@ function receivedMessage(event) {
     } else if (quickReply) {
         var payload = JSON.parse(quickReply.payload);
         if (payload.type === "maps") {
+            // workaround for old bug
+            if (!payload.address) {
+                return;
+            }
+
             sendMapsAnswer(senderID, payload.address);
         } else if (payload.type === "weather") {
             sendWeatherAnswer(senderID, payload.address);
