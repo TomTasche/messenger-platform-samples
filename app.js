@@ -246,20 +246,14 @@ function receivedMessage(event) {
         return;
     } else if (quickReply) {
         var payload = JSON.parse(quickReply.payload);
-        if (payload.type === "maps") {
-          if (true) return;
-
-            // workaround for old bug
-            if (!payload.address) {
-                return;
-            }
-
+        if (payload.type === "maps")
             sendMapsAnswer(senderID, payload.address);
         } else if (payload.type === "weather") {
             sendWeatherAnswer(senderID, payload.address);
         } else if (payload.type === "call") {
             sendTextMessage(senderID, "click here: " + payload.number);
         } else if (payload.type === "website") {
+          if (true) return;
             sendTextMessage(senderID, "click here: " + payload.website);
         }
 
