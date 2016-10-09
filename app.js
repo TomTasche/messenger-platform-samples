@@ -257,6 +257,8 @@ function receivedMessage(event) {
             sendTextMessage(senderID, "click here: " + payload.number);
         } else if (payload.type === "website") {
             sendTextMessage(senderID, "click here: " + payload.website);
+        } else if (payload.type === "uber") {
+            sendTextMessage(senderID, payload.address);
         }
 
         return;
@@ -357,6 +359,11 @@ function sendWeatherAnswer(senderID, address) {
     sendTextMessage(senderID, searchUrl);
 }
 
+function sendUberAnswer(senderID, address) {
+    var uberUrl = "https://m.uber.com/ul/?action=setPickup&client_id=iWn1oae9x9-u8dwOBvc-YEC7tkEOMplW&dropoff[formatted_address]==" + encodeURIComponent(address.formattedAddress);
+    sendTextMessage(senderID, uberUrl);
+}
+
 function findAnswer(senderID, messageText) {
     sendTypingOn(senderID);
 
@@ -402,6 +409,12 @@ function findAnswer(senderID, messageText) {
                     type: "maps",
                     address: address
                 }
+            }, {
+                title: "uber",
+                payload: {
+                    type: "uber",
+                    address: address
+                }
             }];
 
             sendQuickReply(senderID, "address recognized. what do you want me to do with it?", options);
@@ -416,6 +429,12 @@ function findAnswer(senderID, messageText) {
                 title: "maps",
                 payload: {
                     type: "maps",
+                    address: place.address
+                }
+            }, {
+                title: "uber",
+                payload: {
+                    type: "uber",
                     address: place.address
                 }
             }, {
