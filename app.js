@@ -363,7 +363,7 @@ function sendWeatherAnswer(senderID, address) {
 }
 
 function sendUberAnswer(senderID, address) {
-    var uberUrl = "https://m.uber.com/ul/?action=setPickup&client_id=iWn1oae9x9-u8dwOBvc-YEC7tkEOMplW&" + encodeURIComponent("dropoff[formatted_address]=" + address.formattedAddress);
+    var uberUrl = "https://m.uber.com/ul/?action=setPickup&client_id=iWn1oae9x9-u8dwOBvc-YEC7tkEOMplW&" + encodeURIComponent("dropoff[formatted_address]") + "=" + encodeURIComponent(address.formattedAddress);
     sendTextMessage(senderID, uberUrl);
 }
 
