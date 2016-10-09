@@ -463,7 +463,7 @@ function queryPlaces(input) {
 
     var promise = requestPromise(requestOptions);
     promise.then(function(result) {
-        console.log("places", result);
+        console.log("places", JSON.stringify(result));
 
         var success = result.predictions.length > 0;
         if (!success) {
@@ -549,7 +549,7 @@ function queryMaps(input) {
 
     var promise = requestPromise(requestOptions);
     promise.then(function(result) {
-        console.log("maps", result);
+        console.log("maps", JSON.stringify(result));
 
         var success = result.status === "OK";
         if (!success) {
@@ -616,7 +616,7 @@ function queryKnowledgeGraph(input) {
 
     var promise = requestPromise(requestOptions);
     promise.then(function(result) {
-        console.log("knowledge graph", result);
+        console.log("knowledge graph", JSON.stringify(result));
 
         var success = result.itemListElement.length > 0;
         if (!success) {
