@@ -248,6 +248,9 @@ function receivedMessage(event) {
             messageId, appId, metadata);
         return;
     } else if (quickReply) {
+        console.log("Quick reply for message %s with payload %s",
+            messageId, quickReply.payload);
+
         var payload = JSON.parse(quickReply.payload);
         if (payload.type === "maps") {
             sendMapsAnswer(senderID, payload.address);
@@ -360,8 +363,8 @@ function sendWeatherAnswer(senderID, address) {
 }
 
 function sendUberAnswer(senderID, address) {
-    var uberUrl = "https://m.uber.com/ul/?action=setPickup&client_id=iWn1oae9x9-u8dwOBvc-YEC7tkEOMplW&" + encodeURIComponent("dropoff[formatted_address]=" + address.formattedAddress);
-    sendTextMessage(senderID, uberUrl);
+    //var uberUrl = "https://m.uber.com/ul/?action=setPickup&client_id=iWn1oae9x9-u8dwOBvc-YEC7tkEOMplW&" + encodeURIComponent("dropoff[formatted_address]=" + address.formattedAddress);
+    sendTextMessage(senderID, "bla");
 }
 
 function findAnswer(senderID, messageText) {
