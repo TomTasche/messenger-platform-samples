@@ -18,7 +18,10 @@ const
     https = require('https'),
     request = require('request'),
     requestPromise = require('request-promise'),
-    deferred = require('deferred');
+    deferred = require('deferred'),
+    Parser = require('expr-eval').Parser;
+
+var parser = new Parser();
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
@@ -431,9 +434,16 @@ function findAnswer(senderID, messageText) {
 
             sendQuickReply(senderID, "place recognized. what do you want me to do with it?", options);
         } else {
-            // google
+            try {
+                var expression = parser.parse(messageText);
+                var result = expression.evaluate();
 
-            sendTextMessage(senderID, "huh?");
+                sendTextMessage(senderID, result);
+            } catch (e) {
+                // TODO: google
+
+                sendTextMessage(senderID, "huh?");
+            }
         }
     });
 }
