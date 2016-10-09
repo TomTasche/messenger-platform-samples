@@ -253,7 +253,6 @@ function receivedMessage(event) {
         } else if (payload.type === "call") {
             sendTextMessage(senderID, "click here: " + payload.number);
         } else if (payload.type === "website") {
-            if (true) return;
             sendTextMessage(senderID, "click here: " + payload.website);
         }
 
