@@ -1,6 +1,4 @@
 {
-    "appSecret": "92136e14bc52277a7ddb315b075ee568",
-    "pageAccessToken": "EAABgVcLKmIUBAAx2jM79t6Dh0NwZBEzoiyU6linpq8yZAPD3OHPMULOvVScoScrqZAEI6h4VzWvmx9WNVQzrU6BH3Nqcvus1pVGyS93Wqg7ZBF0RyaULIHST1FHOA23JtVNuNncnQHKLDv4VXe235ZAsUySUEwtrMWt1VBENiLwZDZD",
     "validationToken": "my_voice_is_my_password_verify_me",
     "serverURL": "https://assistant-tom.herokuapp.com/"
 }
