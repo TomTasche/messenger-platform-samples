@@ -31,6 +31,8 @@ app.use(bodyParser.json({
 }));
 app.use(express.static('public'));
 
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+
 /*
  * Be sure to setup your config values before running this code. You can
  * set them using environment variables or modifying the config file in /config.
@@ -479,7 +481,7 @@ function queryPlaces(input) {
         json: true,
         qs: {
             input: input,
-            key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw"
+            key: GOOGLE_API_KEY
         }
     };
 
@@ -503,7 +505,7 @@ function queryPlaces(input) {
             json: true,
             qs: {
                 placeid: placeId,
-                key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw"
+                key: GOOGLE_API_KEY
             }
         };
 
@@ -565,7 +567,7 @@ function queryMaps(input) {
         json: true,
         qs: {
             address: input,
-            key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw"
+            key: GOOGLE_API_KEY
         }
     };
 
@@ -631,7 +633,7 @@ function queryKnowledgeGraph(input) {
         json: true,
         qs: {
             query: input,
-            key: "AIzaSyDDa72m8I9ZCIcraFAJkpYo0CH6jRzuumw",
+            key: GOOGLE_API_KEY,
             limit: 1
         }
     };
